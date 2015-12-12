@@ -65,6 +65,19 @@ def clone():
     mode_set(mode='EDIT')
 
 
+def delete_clone():
+    ob = bpy.context.active_object
+    meshes = bpy.data.meshes
+
+    if ob and (ob.name +  '_clone') in meshes:
+        clone_name = ob.name +  '_clone'
+        try:
+            meshes.remove(meshes[clone_name])
+            print('Mesh: {0} removed'.format(clone_name))
+        except:
+            print('failed to remove clone [ {0} ]..panic ! '.format(clone_name))
+
+
 def restore():
     ob = bpy.context.active_object
     mode_set(mode='OBJECT')
@@ -135,14 +148,21 @@ class ClonedRestore(bpy.types.Panel):
 
         obj = context.object
         col = layout.column()
+        
+        ob = context.active_object
+        clone_is_present = bool(ob) and (ob.name + '_clone' in bpy.data.meshes)
+        op_dispatch = "object.cloned_restore_op"
+
+        if clone_is_present:
+            opdel = 'delete_clone'
+            col.operator(op_dispatch, text=op, ico='CANCEL').fn_name = opdel
 
         operators = 'clone', 'restore', 'changed'
         for op in operators:
-            ob = context.active_object
-            if op == 'clone' and ob and (ob.name + '_clone' in bpy.data.meshes):
+            if op == 'clone' and clone_is_present:
                 col.label('cloned as: ' + ob.name + '_clone')
             else:
-                col.operator("object.cloned_restore_op", text=op).fn_name = op
+                col.operator(op_dispatch, text=op).fn_name = op
 
         scn = context.scene
         col.label('I / O')
