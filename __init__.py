@@ -145,26 +145,25 @@ class ClonedRestore(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-
-        obj = context.object
         col = layout.column()
-        
-        ob = context.active_object
-        clone_is_present = bool(ob) and (ob.name + '_clone' in bpy.data.meshes)
-        op_dispatch = "object.cloned_restore_op"
 
+        ob = context.active_object
+        scn = context.scene
+        op_dispatch = "object.cloned_restore_op"
+        operators = 'clone', 'restore', 'changed'
+
+        clone_is_present = bool(ob) and (ob.name + '_clone' in bpy.data.meshes)
+        
         if clone_is_present:
             opdel = 'delete_clone'
             col.operator(op_dispatch, text=op, ico='CANCEL').fn_name = opdel
 
-        operators = 'clone', 'restore', 'changed'
         for op in operators:
             if op == 'clone' and clone_is_present:
                 col.label('cloned as: ' + ob.name + '_clone')
             else:
                 col.operator(op_dispatch, text=op).fn_name = op
 
-        scn = context.scene
         col.label('I / O')
 
         row = col.row(align=True)
