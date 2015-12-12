@@ -156,7 +156,7 @@ class ClonedRestore(bpy.types.Panel):
         
         if clone_is_present:
             opdel = 'delete_clone'
-            col.operator(op_dispatch, text=op, ico='CANCEL').fn_name = opdel
+            col.operator(op_dispatch, text=opdel, ico='CANCEL').fn_name = opdel
 
         for op in operators:
             if op == 'clone' and clone_is_present:
